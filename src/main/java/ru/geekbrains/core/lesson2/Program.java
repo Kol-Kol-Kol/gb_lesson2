@@ -14,16 +14,16 @@ public class Program {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Random random = new Random();
 
-    private static  char[][] field;
+    private static char[][] field;
     private static int fieldSizeX;
     private static int fieldSizeY;
 
 
     public static void main(String[] args) {
-        while (true){
+        while (true) {
             initialize();
             printField();
-            while (true){
+            while (true) {
                 humanTurn();
                 printField();
                 if (checkGameState(DOT_HUMAN, "Вы победили!"))
@@ -42,13 +42,13 @@ public class Program {
     /**
      * Инициализация игрового поля
      */
-    static void initialize(){
+    static void initialize() {
         fieldSizeY = 5;
         fieldSizeX = 5;
 
         field = new char[fieldSizeY][fieldSizeX];
-        for (int y = 0; y < fieldSizeY; y++){
-            for (int x = 0; x < fieldSizeX; x++){
+        for (int y = 0; y < fieldSizeY; y++) {
+            for (int x = 0; x < fieldSizeX; x++) {
                 field[y][x] = DOT_EMPTY;
             }
         }
@@ -57,22 +57,22 @@ public class Program {
     /**
      * Печать текущего состояния игрового поля
      */
-    private static void printField(){
+    private static void printField() {
         System.out.print("+");
-        for (int i = 0; i < fieldSizeX; i++){
+        for (int i = 0; i < fieldSizeX; i++) {
             System.out.print("-" + (i + 1));
         }
         System.out.println("-");
 
-        for (int y = 0; y < fieldSizeY; y++){
+        for (int y = 0; y < fieldSizeY; y++) {
             System.out.print(y + 1 + "|");
-            for (int x = 0; x < fieldSizeX; x++){
+            for (int x = 0; x < fieldSizeX; x++) {
                 System.out.print(field[y][x] + "|");
             }
             System.out.println();
         }
 
-        for (int i = 0; i < fieldSizeX * 2 + 2; i++){
+        for (int i = 0; i < fieldSizeX * 2 + 2; i++) {
             System.out.print("-");
         }
         System.out.println();
@@ -81,7 +81,7 @@ public class Program {
     /**
      * Ход игрока (человека)
      */
-    static void humanTurn(){
+    static void humanTurn() {
         int x;
         int y;
 
@@ -98,7 +98,7 @@ public class Program {
     /**
      * Ход игрока (компьютера)
      */
-    static void aiTurn(){
+    static void aiTurn() {
         int x;
         int y;
 
@@ -113,37 +113,40 @@ public class Program {
 
     /**
      * Проверка, является ли ячейка игрового поля пустой
+     *
      * @param x
      * @param y
      * @return
      */
-    static boolean isCellEmpty(int x, int y){
+    static boolean isCellEmpty(int x, int y) {
         return field[y][x] == DOT_EMPTY;
     }
 
     /**
      * Проверка доступности ячейки игрового поля
+     *
      * @param x
      * @param y
      * @return
      */
-    static boolean isCellValid(int x, int y){
-        return x >= 0 && x< fieldSizeX && y >= 0 && y < fieldSizeY;
+    static boolean isCellValid(int x, int y) {
+        return x >= 0 && x < fieldSizeX && y >= 0 && y < fieldSizeY;
     }
 
 
     /**
      * Метод проверки состояния игры
+     *
      * @param dot фишка игрока
-     * @param s победный слоган
+     * @param s   победный слоган
      * @return результат проверки состояния игры
      */
-    static boolean checkGameState(char dot, String s){
-        if (checkWin(dot)){
+    static boolean checkGameState(char dot, String s) {
+        if (checkWin(dot)) {
             System.out.println(s);
             return true;
         }
-        if (checkDraw()){
+        if (checkDraw()) {
             System.out.println("Ничья!");
             return true;
         }
@@ -152,11 +155,12 @@ public class Program {
 
     /**
      * Проверка на ничью
+     *
      * @return
      */
-    static boolean checkDraw(){
-        for (int y = 0; y < fieldSizeY; y++){
-            for (int x = 0; x < fieldSizeX; x++){
+    static boolean checkDraw() {
+        for (int y = 0; y < fieldSizeY; y++) {
+            for (int x = 0; x < fieldSizeX; x++) {
                 if (isCellEmpty(x, y))
                     return false;
             }
@@ -166,10 +170,11 @@ public class Program {
 
     /**
      * Проверка победы игрока
+     *
      * @param dot фишка игрока
      * @return признак победы
      */
-    static boolean checkWin(char dot){
+/*    static boolean checkWin(char dot) {
         // Проверка по трем горизонталям
         if (field[0][0] == dot && field[0][1] == dot && field[0][2] == dot) return true;
         if (field[1][0] == dot && field[1][1] == dot && field[1][2] == dot) return true;
@@ -185,24 +190,27 @@ public class Program {
         if (field[0][2] == dot && field[1][1] == dot && field[2][0] == dot) return true;
 
         return false;
-    }
-
-    static boolean check1(int x, int y, char dot, int winCount){
+    }*/
+    private static boolean checkWin(char dot) {
+        for (int i = 0; i < fieldSizeX; i++) {
+            for (int j = 0; j < fieldSizeY; j++) {
+                if (checkLine(i, j, 1, 0, WIN_COUNT, dot)) return true;
+                if (checkLine(i, j, 1, 1, WIN_COUNT, dot)) return true;
+                if (checkLine(i, j, 0, 1, WIN_COUNT, dot)) return true;
+                if (checkLine(i, j, 1, -1, WIN_COUNT, dot)) return true;
+            }
+        }
         return false;
     }
 
-    static boolean check2(int x, int y, char dot, int winCount){
-        return false;
+    private static boolean checkLine(int x, int y, int vx, int vy, int len, int c) {
+        final int far_x = x + (len - 1) * vx;
+        final int far_y = y + (len - 1) * vy;
+        if (!isCellValid(far_x, far_y)) return false;
+        for (int i = 0; i < len; i++) {
+            if (field[y + i * vy][x + i * vx] != c) return false;
+        }
+        return true;
     }
-
-    static boolean check3(int x, int y, char dot, int winCount){
-        return false;
-    }
-
-    static boolean check4(int x, int y, char dot, int winCount){
-        return false;
-    }
-
-
 
 }
